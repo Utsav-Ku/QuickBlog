@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 
 export const adminLogin = async (req, res) => {
     try{
-        console.log("Admin Login Request Received");
         const { email, password } = req.body;
         if(email != process.env.ADMIN_EMAIL || password != process.env.ADMIN_PASSWORD) {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
@@ -12,7 +11,6 @@ export const adminLogin = async (req, res) => {
         res.json({success: true, token});
 
     } catch (error) {
-        console.log("Error in adminLogin:", error.message);
         res.json({success: false, message: error.message})
     }
 }
