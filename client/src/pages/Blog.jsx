@@ -49,7 +49,7 @@ const Blog = () => {
     e.preventDefault();
 
     try {
-      const data = await axios.post('/api/blog/add-comment', {blog: id, name, content});
+      const { data } = await axios.post('/api/blog/add-comment', { blog: id, name, content });
 
       if(data.success){
         toast.success(data.message);
@@ -67,8 +67,8 @@ const Blog = () => {
   }
 
   useEffect(() => {
-    fetchBlogData(),
-    fetchComments()
+    fetchBlogData();
+    fetchComments();
   }, [])
 
   return data ?  (
