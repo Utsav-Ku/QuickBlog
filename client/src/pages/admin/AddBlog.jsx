@@ -3,6 +3,7 @@ import { assets, blogCategories } from '../../assets/assets'
 import Quill from 'quill'
 import { useAppContext } from '../../context/AppContext'
 import toast from 'react-hot-toast'
+import  { marked as parse}  from 'marked'
 
 const AddBlog = () => {
 
@@ -17,6 +18,7 @@ const AddBlog = () => {
     const [subTitle, setSubTitle] = useState('');
     const [category, setCategory] = useState('Startup');
     const [isPublished, setIsPublished] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const onSubmitHandler = async (e) => {
 
@@ -57,7 +59,26 @@ const AddBlog = () => {
     }
 
     const generateContent = async() => {
+        if(!title) return toast.error('Please enter a title first');
 
+        try {
+            setLoading(true);
+            const { data } = await axios.post('/api/blog/generate', { prompt: title });
+            if(data.success){
+                quillRef.current.root.innerHTML = parse(data.content);
+            }
+            else{
+                toast.error(data.message);
+                setLoading(false);
+            }
+
+        } catch (error) {
+            toast.error(error.message);
+            setLoading(false);
+
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -86,7 +107,22 @@ const AddBlog = () => {
                 <p className='mt-4'>Blog Description</p>
                 <div className='max-w-lg h-74 pb-16 sm:pb-10 pt-2 relative'>
                     <div ref={editorRef}></div>
-                    <button type='button' onClick={generateContent} className='absolute bottom-1 right-2 ml-2 text-xs text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer'>Generate with AI</button>
+                    <button
+                        type='button'
+                        onClick={generateContent}
+                        disabled={loading}
+                        className='absolute bottom-1 right-2 ml-2 text-xs text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer flex items-center justify-center gap-2'
+                    >
+                        {loading ? (
+                            <>
+                            <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+                            Generating...
+                            </>
+                        ) : (
+                            '✨ Generate with AI'
+                        )}
+                    </button>
+
                 </div>
 
                 <p className='mt-4'>Blog category</p>
