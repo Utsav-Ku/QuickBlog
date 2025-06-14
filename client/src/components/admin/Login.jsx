@@ -21,11 +21,15 @@ const Login = () => {
                 toast.success("Login successful");
             }
             else{
-                toast.error(data.message);
+                toast.error(data.message || "Login failed");
             }
 
-        } catch (error) {
-            toast.error(error.message)
+        }  catch (error) {
+            if (error.response && error.response.status === 401) {
+                toast.error("Wrong credentials");
+            } else {
+                toast.error(error.response?.data?.message || error.message || "Something went wrong");
+            }
         }
     }
 
